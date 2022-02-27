@@ -187,69 +187,89 @@ class _PuzzleViewState extends State<PuzzleView> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (BuildContext buildContext, BoxConstraints boxConstraints){
+    return LayoutBuilder(builder: (BuildContext buildContext, BoxConstraints boxConstraints) {
       return Container(
-      constraints: BoxConstraints(maxWidth: () {
-        if (_rowCount == 3) return boxConstraints.maxWidth * 0.65;
-        if (_rowCount == 4) return boxConstraints.maxWidth * 0.8;
-        if (_rowCount == 5) return boxConstraints.maxWidth * 0.9;
-        return double.infinity;
-      }()),
-      child: Listener(
-        onPointerDown: _detectTapedTouchDetectWidget,
-        onPointerMove: _detectTapedTouchDetectWidget,
-        onPointerUp: _clearSelection,
-        child: Padding(
-          padding: const EdgeInsets.only(
-            left: 15,
-            right: 15,
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(color: _bgColor2, borderRadius: BorderRadius.circular(10)),
-            child: MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              removeBottom: true,
-              child: GridView.builder(
-                key: key,
-                shrinkWrap: true,
-                itemCount: _totalCount,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: _rowCount,
-                  childAspectRatio: 1,
-                  crossAxisSpacing: 1.0,
-                  mainAxisSpacing: 1.0,
-                ),
-                itemBuilder: (context, index) {
-                  //start
-                  if (index == _startIndex) {
-                    return TouchDetectWidget(
-                      index: index,
-                      child: Container(
-                        padding: EdgeInsets.all(() {
-                          if (_rowCount == 3) return 8.0; //8.0
-                          if (_rowCount == 4) return 5.0;
-                          if (_rowCount == 5) return 5.0;
-                          return 5.0;
-                        }()),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
-                            color: _selectedIndexes.contains(index) ? _itemselectedColor : Colors.grey.shade600,
-                            borderRadius: BorderRadius.circular(10)),
-                        child: const FittedBox(
-                            fit: BoxFit.contain,
-                            child: Text(
-                              "START",
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                            )),
-                      ),
-                    );
-                  }
+        constraints: BoxConstraints(maxWidth: () {
+          if (_rowCount == 3) return boxConstraints.maxWidth * 0.65;
+          if (_rowCount == 4) return boxConstraints.maxWidth * 0.8;
+          if (_rowCount == 5) return boxConstraints.maxWidth * 0.9;
+          return double.infinity;
+        }()),
+        child: Listener(
+          onPointerDown: _detectTapedTouchDetectWidget,
+          onPointerMove: _detectTapedTouchDetectWidget,
+          onPointerUp: _clearSelection,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 15,
+              right: 15,
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(color: _bgColor2, borderRadius: BorderRadius.circular(10)),
+              child: MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                removeBottom: true,
+                child: GridView.builder(
+                  key: key,
+                  shrinkWrap: true,
+                  itemCount: _totalCount,
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: _rowCount,
+                    childAspectRatio: 1,
+                    crossAxisSpacing: 1.0,
+                    mainAxisSpacing: 1.0,
+                  ),
+                  itemBuilder: (context, index) {
+                    //start
+                    if (index == _startIndex) {
+                      return TouchDetectWidget(
+                        index: index,
+                        child: Container(
+                          padding: EdgeInsets.all(() {
+                            if (_rowCount == 3) return 8.0; //8.0
+                            if (_rowCount == 4) return 5.0;
+                            if (_rowCount == 5) return 5.0;
+                            return 5.0;
+                          }()),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
+                              color: _selectedIndexes.contains(index) ? _itemselectedColor : Colors.grey.shade600,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: const FittedBox(
+                              fit: BoxFit.contain,
+                              child: Text(
+                                "START",
+                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                              )),
+                        ),
+                      );
+                    }
 
-                  //checkPoint
-                  if (_checkPointList.contains(index)) {
+                    //checkPoint
+                    if (_checkPointList.contains(index)) {
+                      return TouchDetectWidget(
+                        // key: UniqueKey(),
+                        index: index,
+                        child: AnimationWidget(
+                          index: index,
+                          isRunAnimaion: _currentSelectIdx == index,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
+                                color: _selectedIndexes.contains(index) ? _itemselectedColor : _itemUnselectColor,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Center(
+                                child: Text(
+                              "${_checkPointList.indexOf(index) + 1}",
+                              style: TextStyle(fontWeight: FontWeight.bold, color: _selectedIndexes.contains(index) ? Colors.white : Colors.grey, fontSize: 30),
+                            )),
+                          ),
+                        ),
+                      );
+                    }
                     return TouchDetectWidget(
                       // key: UniqueKey(),
                       index: index,
@@ -261,36 +281,16 @@ class _PuzzleViewState extends State<PuzzleView> {
                               border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
                               color: _selectedIndexes.contains(index) ? _itemselectedColor : _itemUnselectColor,
                               borderRadius: BorderRadius.circular(10)),
-                          child: Center(
-                              child: Text(
-                            "${_checkPointList.indexOf(index) + 1}",
-                            style: TextStyle(fontWeight: FontWeight.bold, color: _selectedIndexes.contains(index) ? Colors.white : Colors.grey, fontSize: 30),
-                          )),
                         ),
                       ),
                     );
-                  }
-                  return TouchDetectWidget(
-                    // key: UniqueKey(),
-                    index: index,
-                    child: AnimationWidget(
-                      index: index,
-                      isRunAnimaion: _currentSelectIdx == index,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
-                            color: _selectedIndexes.contains(index) ? _itemselectedColor : _itemUnselectColor,
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                    ),
-                  );
-                },
+                  },
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
     });
   }
 

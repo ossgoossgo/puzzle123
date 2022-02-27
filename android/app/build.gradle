@@ -41,6 +41,15 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+      signingConfigs {
+        release {
+            keyAlias key_alias
+            keyPassword key_password
+            storePassword keystore_password
+            storeFile rootProject.file(keystore_file)
+        }
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.ossgo.puzzle123"

@@ -1,4 +1,4 @@
-package com.example.puzzle123
+package com.ossgo.puzzle123
 
 import io.flutter.embedding.android.FlutterActivity
 
