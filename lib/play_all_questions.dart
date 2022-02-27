@@ -264,6 +264,7 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
                               backgroundColor: MaterialStateProperty.all(Colors.pinkAccent),
                             ),
                             onPressed: () {
+                              _player.play("click.mp3", volume: 0.3);
                               _showNextLevelBtn = false;
                               _nextQuestion();
                             },
@@ -321,18 +322,18 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
     );
   }
 
-  _showIntro() {
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        opaque: false, //不透明
-        fullscreenDialog: false,
-        pageBuilder: (buildContext, a1, a2) => SpeedPuzzleIntro(),
-        transitionsBuilder: (buildContext, a1, a2, child) => FadeTransition(opacity: a1, child: child),
-        transitionDuration: const Duration(milliseconds: 250),
-      ),
-    );
-  }
+  // _showIntro() {
+  //   Navigator.push(
+  //     context,
+  //     PageRouteBuilder(
+  //       opaque: false, //不透明
+  //       fullscreenDialog: false,
+  //       pageBuilder: (buildContext, a1, a2) => SpeedPuzzleIntro(),
+  //       transitionsBuilder: (buildContext, a1, a2, child) => FadeTransition(opacity: a1, child: child),
+  //       transitionDuration: const Duration(milliseconds: 250),
+  //     ),
+  //   );
+  // }
 
   _gotoMainPage() {
     Navigator.of(context).pop();
