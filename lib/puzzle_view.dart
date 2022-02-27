@@ -50,7 +50,7 @@ class _PuzzleViewState extends State<PuzzleView> {
   Color _itemUnselectColor = Colors.grey.shade300; //Color.fromARGB(255, 244, 239, 237);
   Color _itemselectedColor = const Color(0xFF4CD6AF);
 
-  int _step = 0; //0,1,2,3,4
+  int _step = 0; //0,1,2,3,4(all)
 
   AudioCache _player = AudioCache(prefix: 'assets/audios/');
 
@@ -196,8 +196,8 @@ class _PuzzleViewState extends State<PuzzleView> {
           return double.infinity;
         }()),
         child: Listener(
-          onPointerDown: _detectTapedTouchDetectWidget,
-          onPointerMove: _detectTapedTouchDetectWidget,
+          onPointerDown: _ondetectTouch,
+          onPointerMove: _ondetectTouch,
           onPointerUp: _clearSelection,
           child: Padding(
             padding: const EdgeInsets.only(
@@ -294,7 +294,8 @@ class _PuzzleViewState extends State<PuzzleView> {
     });
   }
 
-  _detectTapedTouchDetectWidget(PointerEvent event) {
+  _ondetectTouch(PointerEvent event) {
+    if (_step == 4) return;
     if (key!.currentContext == null) return;
     final box = key!.currentContext!.findRenderObject() as RenderBox;
     box.localToGlobal(Offset.zero);
@@ -316,8 +317,8 @@ class _PuzzleViewState extends State<PuzzleView> {
 
   _updateStep(int newSelectIdx) {
     if (_checkPointList.contains(newSelectIdx)) {
-      int step = _checkPointList.indexOf(newSelectIdx) + 1;
-      _controller?.onChangeStep!(step);
+      _step = _checkPointList.indexOf(newSelectIdx) + 1;
+      _controller?.onChangeStep!(_step);
     }
   }
 
@@ -404,6 +405,8 @@ class _PuzzleViewState extends State<PuzzleView> {
   }
 
   void _clearSelection(PointerUpEvent event) {
+    //TouchDetectWidget
+    if (_step == 4) return;
     if (!mounted) return;
     _trackTaped.clear();
     setState(() {
@@ -414,7 +417,14 @@ class _PuzzleViewState extends State<PuzzleView> {
 
   _checkComplete() {
     if (_selectedIndexes.length == _colCount * _rowCount) {
-      _gameClear();
+      _step = 4;
+      _controller?.onChangeStep!(_step);
+
+      if (_step == 4) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          _gameClear();
+        });
+      }
     }
   }
 
