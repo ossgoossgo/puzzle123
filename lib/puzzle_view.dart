@@ -187,11 +187,12 @@ class _PuzzleViewState extends State<PuzzleView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return LayoutBuilder(builder: (BuildContext buildContext, BoxConstraints boxConstraints){
+      return Container(
       constraints: BoxConstraints(maxWidth: () {
-        if (_rowCount == 3) return MediaQuery.of(context).size.width * 0.65;
-        if (_rowCount == 4) return MediaQuery.of(context).size.width * 0.8;
-        if (_rowCount == 5) return MediaQuery.of(context).size.width * 0.9;
+        if (_rowCount == 3) return boxConstraints.maxWidth * 0.65;
+        if (_rowCount == 4) return boxConstraints.maxWidth * 0.8;
+        if (_rowCount == 5) return boxConstraints.maxWidth * 0.9;
         return double.infinity;
       }()),
       child: Listener(
@@ -290,6 +291,7 @@ class _PuzzleViewState extends State<PuzzleView> {
         ),
       ),
     );
+    });
   }
 
   _detectTapedTouchDetectWidget(PointerEvent event) {
