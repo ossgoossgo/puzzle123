@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:puzzle123/animation_widget.dart';
@@ -225,50 +226,52 @@ class _PuzzleViewState extends State<PuzzleView> {
                   itemBuilder: (context, index) {
                     //start
                     if (index == _startIndex) {
-                      return TouchDetectWidget(
-                        index: index,
-                        child: Container(
-                          padding: EdgeInsets.all(() {
-                            if (_rowCount == 3) return 8.0; //8.0
-                            if (_rowCount == 4) return 5.0;
-                            if (_rowCount == 5) return 5.0;
-                            return 5.0;
-                          }()),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
-                              color: _selectedIndexes.contains(index) ? _itemselectedColor : Colors.grey.shade600,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: const FittedBox(
-                              fit: BoxFit.contain,
-                              child: Text(
-                                "START",
-                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                              )),
-                        ),
-                      );
+                      return LayoutBuilder(builder: (BuildContext buildContext, BoxConstraints boxConstraints) {
+                        return TouchDetectWidget(
+                          index: index,
+                          child: Container(
+                            padding: EdgeInsets.all(boxConstraints.maxWidth * 0.1),
+                            decoration: BoxDecoration(
+                                border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
+                                color: _selectedIndexes.contains(index) ? _itemselectedColor : Colors.grey.shade600,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: const FittedBox(
+                                fit: BoxFit.contain,
+                                child: Text(
+                                  "START",
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                                )),
+                          ),
+                        );
+                      });
                     }
 
                     //checkPoint
                     if (_checkPointList.contains(index)) {
-                      return TouchDetectWidget(
-                        // key: UniqueKey(),
-                        index: index,
-                        child: AnimationWidget(
+                      return LayoutBuilder(builder: (BuildContext buildContext, BoxConstraints boxConstraints) {
+                        return TouchDetectWidget(
+                          // key: UniqueKey(),
                           index: index,
-                          isRunAnimaion: _currentSelectIdx == index,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
-                                color: _selectedIndexes.contains(index) ? _itemselectedColor : _itemUnselectColor,
-                                borderRadius: BorderRadius.circular(10)),
-                            child: Center(
+                          child: AnimationWidget(
+                            index: index,
+                            isRunAnimaion: _currentSelectIdx == index,
+                            child: Container(
+                              padding: EdgeInsets.all(boxConstraints.maxWidth * 0.1),
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
+                                  color: _selectedIndexes.contains(index) ? _itemselectedColor : _itemUnselectColor,
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: FittedBox(
+                                fit: BoxFit.contain,
                                 child: Text(
-                              "${_checkPointList.indexOf(index) + 1}",
-                              style: TextStyle(fontWeight: FontWeight.bold, color: _selectedIndexes.contains(index) ? Colors.white : Colors.grey, fontSize: 30),
-                            )),
+                                  "${_checkPointList.indexOf(index) + 1}",
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: _selectedIndexes.contains(index) ? Colors.white : Colors.grey, fontSize: 30),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      });
                     }
                     return TouchDetectWidget(
                       // key: UniqueKey(),

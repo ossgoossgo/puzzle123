@@ -42,9 +42,11 @@ class _StartAnimationState extends State<StartAnimation> with AnimationMixin {
 
   _setController() {
     widget.controller!.play = () {
-      setState(() {
-        control = control == CustomAnimationControl.play ? CustomAnimationControl.playReverse : CustomAnimationControl.play;
-      });
+      if (mounted) {
+        setState(() {
+          control = control == CustomAnimationControl.play ? CustomAnimationControl.playReverse : CustomAnimationControl.play;
+        });
+      }
     };
   }
 
