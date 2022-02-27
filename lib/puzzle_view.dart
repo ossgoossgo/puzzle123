@@ -197,8 +197,8 @@ class _PuzzleViewState extends State<PuzzleView> {
           return double.infinity;
         }()),
         child: Listener(
-          onPointerDown: _ondetectTouch,
-          onPointerMove: _ondetectTouch,
+          onPointerDown: _onDetectTouch,
+          onPointerMove: _onDetectTouch,
           onPointerUp: _clearSelection,
           child: Padding(
             padding: const EdgeInsets.only(
@@ -297,7 +297,7 @@ class _PuzzleViewState extends State<PuzzleView> {
     });
   }
 
-  _ondetectTouch(PointerEvent event) {
+  _onDetectTouch(PointerEvent event) {
     if (_step == 4) return;
     if (key!.currentContext == null) return;
     final box = key!.currentContext!.findRenderObject() as RenderBox;
