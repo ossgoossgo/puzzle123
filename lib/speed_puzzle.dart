@@ -229,7 +229,7 @@ class GamePageState extends State<SpeedPuzzle> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: 25),
+                const SizedBox(height: 25),
                 Padding(
                   padding: const EdgeInsets.only(left: 30, right: 15),
                   child: Row(
@@ -306,7 +306,7 @@ class GamePageState extends State<SpeedPuzzle> {
                                 questionType: _currentQuestion!.type,
                               ),
                             ),
-                            if (_isReady) //目前藉由_isReady啟動動畫
+                            // if (_isReady) //目前藉由_isReady啟動動畫
                               StartAnimation(
                                 controller: _startAnimationController,
                               )

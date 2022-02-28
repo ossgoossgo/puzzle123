@@ -1,37 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:simple_animations/simple_animations.dart';
+import 'package:flutter_sequence_animation/flutter_sequence_animation.dart';
 
 class StartAnimationController {
   void Function()? play;
 }
 
 class StartAnimation extends StatefulWidget {
-  StartAnimationController? controller;
+  final StartAnimationController? controller;
   StartAnimation({Key? key, this.controller}) : super(key: key);
 
   @override
   State<StartAnimation> createState() => _StartAnimationState();
 }
 
-enum AniProps { x, y, opacity }
-
-class _StartAnimationState extends State<StartAnimation> with AnimationMixin {
-  CustomAnimationControl control = CustomAnimationControl.play;
-  final _tween = TimelineTween<AniProps>()
-    //step1
-    ..addScene(begin: Duration.zero, duration: const Duration(seconds: 10), curve: Curves.easeOut).animate(AniProps.y, tween: Tween(begin: 100.0, end: 0.0))
-    ..addScene(begin: Duration.zero, duration: const Duration(seconds: 10)).animate(AniProps.opacity, tween: Tween(begin: 0.0, end: 1.0))
-    //step2
-    ..addScene(begin: const Duration(seconds: 10), duration: const Duration(seconds: 15)).animate(AniProps.y, tween: Tween(begin: 0.0, end: -30.0))
-    //step3
-    ..addScene(begin: const Duration(seconds: 25), duration: const Duration(seconds: 10), curve: Curves.easeIn).animate(AniProps.y, tween: Tween(begin: -30.0, end: -130.0))
-    ..addScene(begin: const Duration(seconds: 25), duration: const Duration(seconds: 10)).animate(AniProps.opacity, tween: Tween(begin: 1.0, end: 0.0));
+class _StartAnimationState extends State<StartAnimation> with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late SequenceAnimation _sequenceAnimation;
 
   @override
   void initState() {
-    controller.play();
-    super.initState();
+    _controller = AnimationController(vsync: this);
+    _sequenceAnimation = SequenceAnimationBuilder()
+        //opacity
+        .addAnimatable(animatable: Tween<double>(begin: 0.0, end: 1.0), from: Duration.zero, to: const Duration(milliseconds: 250), curve: Curves.easeOut, tag: "opacity")
+        .addAnimatable(animatable: Tween<double>(begin: 1.0, end: 1.0), from: const Duration(milliseconds: 250), to: const Duration(milliseconds: 500), curve: Curves.linear, tag: "opacity")
+        .addAnimatable(animatable: Tween<double>(begin: 1.0, end: 0.0), from: const Duration(milliseconds: 500), to: const Duration(milliseconds: 750), curve: Curves.easeIn, tag: "opacity")
+        //position
+        .addAnimatable(animatable: Tween<double>(begin: 150, end: 15.0), from: Duration.zero, to: const Duration(milliseconds: 250), curve: Curves.easeOut, tag: "positionY")
+        .addAnimatable(animatable: Tween<double>(begin: 15.0, end: -15.0), from: const Duration(milliseconds: 250), to: const Duration(milliseconds: 500), curve: Curves.linear, tag: "positionY")
+        .addAnimatable(animatable: Tween<double>(begin: -15.0, end: -150.0), from: const Duration(milliseconds: 500), to: const Duration(milliseconds: 750), curve: Curves.easeIn, tag: "positionY")
+        .animate(_controller);
     _setController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -43,32 +49,31 @@ class _StartAnimationState extends State<StartAnimation> with AnimationMixin {
   _setController() {
     widget.controller!.play = () {
       if (mounted) {
-        setState(() {
-          control = control == CustomAnimationControl.play ? CustomAnimationControl.playReverse : CustomAnimationControl.play;
-        });
+        _controller.reset();
+        _controller.forward();
       }
     };
   }
 
   @override
   Widget build(BuildContext context) {
-    return CustomAnimation<TimelineValue<AniProps>>(
-        control: control,
-        tween: _tween,
-        builder: (context, child, value) {
-          return Center(
-            child: Opacity(
-              opacity: value.get(AniProps.opacity),
-              child: Transform.translate(
-                  offset: Offset(0, value.get(AniProps.y)),
-                  child: FractionallySizedBox(
-                    widthFactor: 0.4,
-                    child: Image.asset(
-                      "assets/images/start.png",
-                    ),
-                  )),
-            ),
-          );
-        });
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (BuildContext context, Widget? child) {
+        return Center(
+          child: Opacity(
+            opacity: _sequenceAnimation["opacity"].value,
+            child: Transform.translate(
+                offset: Offset(0, _sequenceAnimation["positionY"].value),
+                child: FractionallySizedBox(
+                  widthFactor: 0.4,
+                  child: Image.asset(
+                    "assets/images/start.png",
+                  ),
+                )),
+          ),
+        );
+      },
+    );
   }
 }
