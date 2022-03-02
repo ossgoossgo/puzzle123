@@ -19,12 +19,19 @@ import 'dart:io';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  //設定windows linux macos視窗大小
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    await DesktopWindow.setWindowSize(const Size(400, 800));
-    DesktopWindow.setMinWindowSize(const Size(350, 700));
-    DesktopWindow.setMaxWindowSize(const Size(400, 800));
-  }
+  // 放這邊windows run不起來,除非加個delay,但怪怪的 
+  // 設定windows linux macos視窗大小
+  // Future.delayed(Duration(milliseconds: 500), () {
+  //   try {
+  //     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+  //       DesktopWindow.setMinWindowSize(const Size(350, 700));
+  //       DesktopWindow.setMaxWindowSize(const Size(400, 800));
+  //       DesktopWindow.setWindowSize(const Size(400, 800));
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // });
 
   await DBUtil.init();
 
@@ -46,22 +53,50 @@ void main() async {
 _initGameQuestions() {
   //取得總關卡數
   Iterable iterable1 = json.decode(question3x3Str);
-  question3x3List = List<Question>.from(iterable1.map((json) => Question.fromJson(json)));
+  question3x3List =
+      List<Question>.from(iterable1.map((json) => Question.fromJson(json)));
 
   Iterable iterable2 = json.decode(question4x4Str);
-  question4x4List = List<Question>.from(iterable2.map((json) => Question.fromJson(json)));
+  question4x4List =
+      List<Question>.from(iterable2.map((json) => Question.fromJson(json)));
 
   Iterable iterable3 = json.decode(question5x5Str);
-  question5x5List = List<Question>.from(iterable3.map((json) => Question.fromJson(json)));
+  question5x5List =
+      List<Question>.from(iterable3.map((json) => Question.fromJson(json)));
 
   Iterable iterable4 = json.decode(question6x6Str);
-  question6x6List = List<Question>.from(iterable4.map((json) => Question.fromJson(json)));
+  question6x6List =
+      List<Question>.from(iterable4.map((json) => Question.fromJson(json)));
 
-  question6x6ClearSet = DBUtil.getQuestionIsClear(type: QuestionType.question6x6);
+  question6x6ClearSet =
+      DBUtil.getQuestionIsClear(type: QuestionType.question6x6);
 }
 
-class App extends StatelessWidget {
-  const App({Key? key}) : super(key: key);
+class App extends StatefulWidget {
+  App({Key? key}) : super(key: key);
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  @override
+  void initState() {
+    _setScreen();
+    super.initState();
+  }
+
+  _setScreen() async {
+    try {
+      if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+        DesktopWindow.setMinWindowSize(const Size(350, 700));
+        DesktopWindow.setMaxWindowSize(const Size(400, 800));
+        DesktopWindow.setWindowSize(const Size(400, 800));
+      }
+    } catch (e) {
+      debugPrint("$e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
