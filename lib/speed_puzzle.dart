@@ -13,27 +13,23 @@ import 'package:puzzle123/start_animation.dart';
 import 'package:puzzle123/step_indicator.dart';
 import 'package:puzzle123/utility/db_util.dart';
 import 'dart:async';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:puzzle123/utility/sound_helper.dart';
 
 class SpeedPuzzle extends StatefulWidget {
   SpeedPuzzle({Key? key}) : super(key: key);
 
   @override
-  GamePageState createState() {
-    return new GamePageState();
+  SpeedPuzzleState createState() {
+    return SpeedPuzzleState();
   }
 }
 
-class GamePageState extends State<SpeedPuzzle> {
+class SpeedPuzzleState extends State<SpeedPuzzle> {
   final PuzzleViewController _puzzleViewCtr = PuzzleViewController();
   // final StepIndicatorController? _stepIndicatorCtr = StepIndicatorController();
-  Color _bgColor1 = Color(0xFFFDFDFD);
-  Color _bgColor2 = Colors.grey.shade100;
-  Color _itemUnselectColor = Colors.grey.shade300;
-  Color _itemselectedColor = const Color(0xFF4CD6AF);
-  bool _isReady = false;
-
+  final Color _bgColor1 = Color(0xFFFDFDFD);
   List<Question> _remainingQuestionList = [];
   int _totalQuestionLength = 0;
   final int _maxTime = 120;
@@ -45,15 +41,12 @@ class GamePageState extends State<SpeedPuzzle> {
 
   Timer? _timer;
   final StreamController<int> _timerStreamCtr = StreamController<int>();
-
-  AudioCache _player = AudioCache(prefix: 'assets/audios/');
-
-  StartAnimationController _startAnimationController = StartAnimationController();
+  final StartAnimationController _startAnimationCtr = StartAnimationController();
 
   @override
   void initState() {
     super.initState();
-    _initSound();
+    // _initSound();
     setPuzzleViewController();
 
     WidgetsBinding.instance!.addPostFrameCallback((_) {
@@ -69,25 +62,16 @@ class GamePageState extends State<SpeedPuzzle> {
     super.dispose();
   }
 
-  _initSound() async {
-    _player.load('start.mp3');
-    _player.load('lose.mp3');
-    _player.load('win.mp3');
-    _player.load('pause.mp3');
-    _player.load('resume.mp3');
-    _player.load('click.mp3');
-  }
-
   _playGamepassSound() {
-    _player.play("start.mp3", volume: 0.5);
+    SoundHelper.playStartSound(volume: 0.5);
   }
 
   _playLoseSound() {
-    _player.play("lose.mp3");
+    SoundHelper.playLoseSound();
   }
 
   _playWinSound() {
-    _player.play("win.mp3");
+    SoundHelper.playWinSound();
   }
 
   _resetGame() {
@@ -205,12 +189,11 @@ class GamePageState extends State<SpeedPuzzle> {
   _startGame() {
     _playGamepassSound();
     _startCountdownTime();
-    setState(() {
-      _isReady = true;
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      if (_startAnimationCtr.play != null) {
+        _startAnimationCtr.play!();
+      }
     });
-    if (_startAnimationController.play != null) {
-      _startAnimationController.play!();
-    }
   }
 
   @override
@@ -307,9 +290,9 @@ class GamePageState extends State<SpeedPuzzle> {
                               ),
                             ),
                             // if (_isReady) //目前藉由_isReady啟動動畫
-                              StartAnimation(
-                                controller: _startAnimationController,
-                              )
+                            StartAnimation(
+                              controller: _startAnimationCtr,
+                            )
                           ],
                         )
                       : _isGameLose
@@ -361,6 +344,7 @@ class GamePageState extends State<SpeedPuzzle> {
                     backgroundColor: MaterialStateProperty.all(Colors.pinkAccent),
                   ),
                   onPressed: () {
+                    SoundHelper.playClickSound();
                     Navigator.of(context).pop();
                   },
                   child: Padding(
@@ -388,11 +372,12 @@ class GamePageState extends State<SpeedPuzzle> {
                     backgroundColor: MaterialStateProperty.all(Colors.pinkAccent),
                   ),
                   onPressed: () {
+                    SoundHelper.playClickSound();
                     _resetGame();
                     _startGame();
                   },
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 2),
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Baseline(
@@ -432,10 +417,11 @@ class GamePageState extends State<SpeedPuzzle> {
                     backgroundColor: MaterialStateProperty.all(Colors.pinkAccent),
                   ),
                   onPressed: () {
+                    SoundHelper.playClickSound();
                     Navigator.of(context).pop();
                   },
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Baseline(
@@ -459,16 +445,17 @@ class GamePageState extends State<SpeedPuzzle> {
                     backgroundColor: MaterialStateProperty.all(Colors.pinkAccent), //Colors.blue
                   ),
                   onPressed: () {
+                    SoundHelper.playClickSound();
                     _resetGame();
                     _startGame();
                   },
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Baseline(
                         baselineType: TextBaseline.alphabetic,
-                        baseline: kIsWeb ? (1.5 * 18 - 1.5 * 18 / 4) : (1.5 * 30 - 1.5 * 30 / 4), //height * textSize - height * textSize / 4;
+                        baseline: kIsWeb ? (1.5 * 18 - 1.5 * 18 / 4) : (1.5 * 30 - 1.5 * 30 / 4),
                         child: const Text(
                           "PLAY AGAIN",
                           style: TextStyle(height: 1.5, fontSize: kIsWeb ? 18 : 30, fontFamily: "BalooBhaijaan2", color: Colors.white),
@@ -484,8 +471,8 @@ class GamePageState extends State<SpeedPuzzle> {
   }
 
   _showPause() {
-    _player.play("pause.mp3", volume: 0.4);
-
+    // _player.play("pause.mp3", volume: 0.4);
+    SoundHelper.playPauseSound(volume: 0.4);
     Navigator.push(
       context,
       PageRouteBuilder(
@@ -497,7 +484,7 @@ class GamePageState extends State<SpeedPuzzle> {
           btn1TextColor: Colors.white,
           btn1Color: Colors.pinkAccent,
           onBtn1Pressed: () {
-            _player.play("click.mp3", volume: 0.3);
+            SoundHelper.playClickSound();
             _resetGame();
             _startGame();
           },
@@ -505,13 +492,13 @@ class GamePageState extends State<SpeedPuzzle> {
           btn2TextColor: Colors.white,
           btn2Color: Colors.pinkAccent,
           onBtn2Pressed: () {
-            _player.play("click.mp3", volume: 0.3);
+            SoundHelper.playClickSound();
             _gotoMainPage();
           },
           onCancel: () {
-            _player.play("click.mp3", volume: 0.3);
+            SoundHelper.playClickSound();
             _startCountdownTime();
-            _player.play("resume.mp3", volume: 0.4);
+            SoundHelper.playResumeSound();
           },
         ),
         transitionsBuilder: (buildContext, a1, a2, child) => FadeTransition(opacity: a1, child: child),

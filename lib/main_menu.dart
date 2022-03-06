@@ -5,8 +5,9 @@ import 'package:puzzle123/game_page.dart';
 import 'package:puzzle123/how_to_play.dart';
 import 'package:puzzle123/play_all_questions.dart';
 import 'package:puzzle123/speed_puzzle.dart';
+import 'package:puzzle123/utility/sound_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class MainMenuPage extends StatefulWidget {
@@ -20,21 +21,27 @@ class _MainMenuPageState extends State<MainMenuPage> {
   int total6x6Count = 0;
   int total6x6ClearCount = 0;
 
-  AudioCache _player = AudioCache(prefix: 'assets/audios/');
+  // AudioCache _player = AudioCache(prefix: 'assets/audios/');
 
   @override
   void initState() {
     super.initState();
-    _initSound();
+    // _initSound();
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       _checkNeedShowHowToPlay();
     });
   }
 
-
-  _initSound() async {
-    _player.load('click.mp3');
+  @override
+  void dispose() {
+    // _player.clearAll();
+    super.dispose();
   }
+
+
+  // _initSound() async {
+  //   _player.load('click.mp3');
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +91,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
                               width: MediaQuery.of(context).size.width * 0.6,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  _player.play("click.mp3", volume: 0.3);
+                                  SoundHelper.playClickSound();
+                                  // _player.play("click.mp3", volume: 0.3);
                                   _gotoSpeedPuzzle();
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -116,7 +124,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
                               width: MediaQuery.of(context).size.width * 0.6,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  _player.play("click.mp3", volume: 0.3);
+                                  // _player.play("click.mp3", volume: 0.3);
+                                  SoundHelper.playClickSound();
                                   _gotoPlayAllQuestion();
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -155,7 +164,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
                               width: MediaQuery.of(context).size.width * 0.6,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  _player.play("click.mp3", volume: 0.3);
+                                  // _player.play("click.mp3", volume: 0.3);
+                                  SoundHelper.playClickSound();
                                   _showHowToPlay();
                                 },
                                 style: ElevatedButton.styleFrom(

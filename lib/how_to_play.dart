@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:puzzle123/def.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+// import 'package:audioplayers/audioplayers.dart';
+import 'package:puzzle123/utility/sound_helper.dart';
+
 class HowToPlay extends StatefulWidget {
   HowToPlay({Key? key}) : super(key: key);
 
@@ -11,6 +14,7 @@ class HowToPlay extends StatefulWidget {
 class _HowToPlayState extends State<HowToPlay> {
   int _pageIndex = 0;
   late PageController _pageController;
+  // AudioCache _player = AudioCache(prefix: 'assets/audios/');
 
   @override
   void initState() {
@@ -19,6 +23,12 @@ class _HowToPlayState extends State<HowToPlay> {
       initialPage: 0,
       viewportFraction: 1.0,
     );
+  }
+
+  @override
+  void dispose() {
+    // _player.clearAll();
+    super.dispose();
   }
 
   @override
@@ -60,6 +70,8 @@ class _HowToPlayState extends State<HowToPlay> {
                                   child: IconButton(
                                       padding: EdgeInsets.zero,
                                       onPressed: () {
+                                        SoundHelper.playClickSound();
+                                        // _player.play("click.mp3", volume: 0.3);
                                         Navigator.of(context).pop();
                                       },
                                       icon: Icon(Icons.close)))

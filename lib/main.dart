@@ -16,6 +16,8 @@ import 'package:puzzle123/utility/db_util.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'dart:io';
 
+import 'package:puzzle123/utility/sound_helper.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -32,7 +34,7 @@ void main() async {
   //     print(e);
   //   }
   // });
-
+  await SoundHelper.init();
   await DBUtil.init();
 
   _initGameQuestions();

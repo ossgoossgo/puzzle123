@@ -11,8 +11,9 @@ import 'package:puzzle123/speed_puzzle_intro.dart';
 import 'package:puzzle123/start_animation.dart';
 import 'package:puzzle123/step_indicator.dart';
 import 'package:puzzle123/utility/db_util.dart';
+import 'package:puzzle123/utility/sound_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class PlayAllQuestions extends StatefulWidget {
@@ -42,12 +43,12 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
   Color _itemUnselectColor = Colors.grey.shade300; //Color.fromARGB(255, 244, 239, 237);
   Color _itemselectedColor = const Color(0xFF4CD6AF);
 
-  AudioCache _player = AudioCache(prefix: 'assets/audios/');
+  // AudioCache _player = AudioCache(prefix: 'assets/audios/');
 
   @override
   void initState() {
     super.initState();
-    _initSound();
+    // _initSound();
     _questionType = widget.type!;
 
     WidgetsBinding.instance!.addPostFrameCallback((_) {
@@ -58,11 +59,11 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
     });
   }
 
-  _initSound() async {
-    _player.load('win.mp3');
-    _player.load('pause.mp3');
-    _player.load('resume.mp3');
-  }
+  // _initSound() async {
+  //   _player.load('win.mp3');
+  //   _player.load('pause.mp3');
+  //   _player.load('resume.mp3');
+  // }
 
   //最後一次玩的ID
   Future<String?> _getLastPlayQuestionId() async {
@@ -105,6 +106,7 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
   }
 
   _nextQuestion() {
+    SoundHelper.playClickSound();
     if (_currentQuestionIdx == -1) return;
     if (_currentQuestionIdx + 1 <= _questionList.length - 1) {
       _currentQuestionIdx++;
@@ -114,6 +116,7 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
   }
 
   _prevQuestion() {
+    SoundHelper.playClickSound();
     if (_currentQuestionIdx == -1) return;
     if (_currentQuestionIdx - 1 >= 0) {
       _currentQuestionIdx--;
@@ -125,7 +128,8 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
   setPuzzleViewController() {
     //過關
     _puzzleViewCtr.onGameClear = () {
-      _player.play("win.mp3");
+      // _player.play("win.mp3");
+      SoundHelper.playWinSound();
       setState(() {
         question6x6ClearSet.add(_currentQuestion!.id!);
         DBUtil.saveQuestionIsClear(type: widget.type!, data: question6x6ClearSet);
@@ -264,7 +268,8 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
                               backgroundColor: MaterialStateProperty.all(Colors.pinkAccent),
                             ),
                             onPressed: () {
-                              _player.play("click.mp3", volume: 0.3);
+                              // _player.play("click.mp3", volume: 0.3);
+                              SoundHelper.playClickSound(volume: 0.3);
                               _showNextLevelBtn = false;
                               _nextQuestion();
                             },
@@ -289,7 +294,8 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
   }
 
   _showPause() {
-    _player.play("pause.mp3", volume: 0.4);
+    // _player.play("pause.mp3", volume: 0.4);
+    SoundHelper.playPauseSound(volume: 0.4);
     Navigator.push(
       context,
       PageRouteBuilder(
@@ -301,7 +307,8 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
           btn1TextColor: Colors.white,
           btn1Color: Colors.pinkAccent,
           onBtn1Pressed: () {
-            _player.play("click.mp3", volume: 0.3);
+            // _player.play("click.mp3", volume: 0.3);
+            SoundHelper.playClickSound(volume: 0.3);
             _saveLastPlayQuestionID();
             _gotoMainPage();
           },
@@ -309,11 +316,14 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
           btn2TextColor: Colors.white,
           btn2Color: Colors.pinkAccent,
           onBtn2Pressed: () {
-            _player.play("click.mp3", volume: 0.3);
+            // _player.play("click.mp3", volume: 0.3);
+            SoundHelper.playClickSound(volume: 0.3);
           },
           onCancel: () {
-            _player.play("click.mp3", volume: 0.3);
-            _player.play("resume.mp3", volume: 0.4);
+            // _player.play("click.mp3", volume: 0.3);
+            SoundHelper.playClickSound(volume: 0.3);
+            // _player.play("resume.mp3", volume: 0.4);
+            SoundHelper.playResumeSound(volume: 0.4);
           },
         ),
         transitionsBuilder: (buildContext, a1, a2, child) => FadeTransition(opacity: a1, child: child),

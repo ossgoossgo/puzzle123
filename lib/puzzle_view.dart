@@ -1,13 +1,16 @@
 import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:puzzle123/animation_widget.dart';
 import 'package:puzzle123/def.dart';
 import 'package:puzzle123/models/question.dart';
-// import 'package:assets_audio_player/assets_audio_player.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:puzzle123/utility/sound_helper.dart';
+// import 'package:soundpool/soundpool.dart';
+
+// sound play lag in ios browser, other platform ok
+// import 'package:audioplayers/audioplayers.dart';
 
 enum GameState { loadGame, gameStart, complete, animationOut }
 
@@ -40,20 +43,21 @@ class _PuzzleViewState extends State<PuzzleView> {
   int _colCount = 6; //直的數量
   int _rowCount = 6; //橫的數量
   int? _totalCount;
-  int _checkPointCount = 3;
+  final int _checkPointCount = 3;
 
   int? _currentSelectIdx;
   int? _startIndex;
   List<int> _checkPointList = [];
 
-  Color _bgColor1 = Color(0xFFFDFDFD);
-  Color _bgColor2 = Colors.grey.shade100;
-  Color _itemUnselectColor = Colors.grey.shade300; //Color.fromARGB(255, 244, 239, 237);
-  Color _itemselectedColor = const Color(0xFF4CD6AF);
+  final Color _bgColor = Colors.grey.shade100;
+  final Color _itemUnselectColor = Colors.grey.shade300; //Color.fromARGB(255, 244, 239, 237);
+  final Color _itemselectedColor = const Color(0xFF4CD6AF);
 
   int _step = 0; //0,1,2,3,4(all)
 
-  AudioCache _player = AudioCache(prefix: 'assets/audios/');
+  //audioplayers
+  // AudioCache _player = AudioCache(prefix: 'assets/audios/');
+  // final Soundpool _soudPool = Soundpool.fromOptions(options: const SoundpoolOptions(streamType: StreamType.alarm, maxStreams: 10));
 
   @override
   void didUpdateWidget(PuzzleView oldWidget) {
@@ -64,17 +68,25 @@ class _PuzzleViewState extends State<PuzzleView> {
   @override
   void initState() {
     super.initState();
-    _initGamePassSound();
     _setController();
     _resetGame();
   }
 
-  _initGamePassSound() async {
-    _player.load('gamepass.mp3');
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   _playGamepassSound() {
-    _player.play("gamepass.mp3");
+    SoundHelper.playGamepassSound();
+  }
+
+  _playBoSound() {
+    SoundHelper.playBoSound();
+  }
+
+  _playCancelSound() {
+    SoundHelper.playCancelSound();
   }
 
   _setController() {
@@ -207,7 +219,7 @@ class _PuzzleViewState extends State<PuzzleView> {
             ),
             child: Container(
               padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(color: _bgColor2, borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: _bgColor, borderRadius: BorderRadius.circular(10)),
               child: MediaQuery.removePadding(
                 context: context,
                 removeTop: true,
@@ -216,12 +228,12 @@ class _PuzzleViewState extends State<PuzzleView> {
                   key: key,
                   shrinkWrap: true,
                   itemCount: _totalCount,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: _rowCount,
                     childAspectRatio: 1,
-                    crossAxisSpacing: 1.0,
-                    mainAxisSpacing: 1.0,
+                    crossAxisSpacing: 0,
+                    mainAxisSpacing: 0,
                   ),
                   itemBuilder: (context, index) {
                     //start
@@ -230,9 +242,9 @@ class _PuzzleViewState extends State<PuzzleView> {
                         return TouchDetectWidget(
                           index: index,
                           child: Container(
+                            margin: EdgeInsets.all(_selectedIndexes.contains(index) ? 1 : 2),
                             padding: EdgeInsets.all(boxConstraints.maxWidth * 0.1),
                             decoration: BoxDecoration(
-                                border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
                                 color: _selectedIndexes.contains(index) ? _itemselectedColor : Colors.grey.shade600,
                                 borderRadius: BorderRadius.circular(10)),
                             child: const FittedBox(
@@ -250,15 +262,14 @@ class _PuzzleViewState extends State<PuzzleView> {
                     if (_checkPointList.contains(index)) {
                       return LayoutBuilder(builder: (BuildContext buildContext, BoxConstraints boxConstraints) {
                         return TouchDetectWidget(
-                          // key: UniqueKey(),
                           index: index,
                           child: AnimationWidget(
                             index: index,
                             isRunAnimaion: _currentSelectIdx == index,
                             child: Container(
+                              margin: EdgeInsets.all(_selectedIndexes.contains(index) ? 1 : 2),
                               padding: EdgeInsets.all(boxConstraints.maxWidth * 0.1),
                               decoration: BoxDecoration(
-                                  border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
                                   color: _selectedIndexes.contains(index) ? _itemselectedColor : _itemUnselectColor,
                                   borderRadius: BorderRadius.circular(10)),
                               child: FittedBox(
@@ -274,14 +285,14 @@ class _PuzzleViewState extends State<PuzzleView> {
                       });
                     }
                     return TouchDetectWidget(
-                      // key: UniqueKey(),
                       index: index,
                       child: AnimationWidget(
                         index: index,
                         isRunAnimaion: _currentSelectIdx == index,
                         child: Container(
+                          margin: EdgeInsets.all(_selectedIndexes.contains(index) ? 1 : 2),
+                          padding: EdgeInsets.all(boxConstraints.maxWidth * 0.1),
                           decoration: BoxDecoration(
-                              border: Border.all(color: _bgColor2, width: _selectedIndexes.contains(index) ? 0.0 : 2.0),
                               color: _selectedIndexes.contains(index) ? _itemselectedColor : _itemUnselectColor,
                               borderRadius: BorderRadius.circular(10)),
                         ),
@@ -327,12 +338,15 @@ class _PuzzleViewState extends State<PuzzleView> {
 
   _selectIndex(int? index) {
     if (!mounted) return;
-    setState(() {
-      if (!_selectedIndexes.contains(index)) {
-        _currentSelectIdx = index;
-      }
-      _selectedIndexes.add(index!);
-    });
+
+    if (!_selectedIndexes.contains(index)) {
+      Random random = Random();
+      _currentSelectIdx = index;
+      _playBoSound();
+      setState(() {
+        _selectedIndexes.add(index!);
+      });
+    }
   }
 
   bool _canSelect(int index) {
@@ -411,6 +425,7 @@ class _PuzzleViewState extends State<PuzzleView> {
     //TouchDetectWidget
     if (_step == 4) return;
     if (!mounted) return;
+    _playCancelSound();
     _trackTaped.clear();
     setState(() {
       _resetSelectIdx();
