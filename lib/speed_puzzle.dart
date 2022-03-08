@@ -16,6 +16,7 @@ import 'dart:async';
 // import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:puzzle123/utility/sound_helper.dart';
+import 'package:confetti/confetti.dart';
 
 class SpeedPuzzle extends StatefulWidget {
   SpeedPuzzle({Key? key}) : super(key: key);
@@ -42,11 +43,13 @@ class SpeedPuzzleState extends State<SpeedPuzzle> {
   Timer? _timer;
   final StreamController<int> _timerStreamCtr = StreamController<int>();
   final StartAnimationController _startAnimationCtr = StartAnimationController();
+  late ConfettiController _confettiCtr;
 
   @override
   void initState() {
     super.initState();
     // _initSound();
+    _confettiCtr = ConfettiController(duration: const Duration(milliseconds: 100));
     setPuzzleViewController();
 
     WidgetsBinding.instance!.addPostFrameCallback((_) {
@@ -57,6 +60,7 @@ class SpeedPuzzleState extends State<SpeedPuzzle> {
 
   @override
   void dispose() {
+    _confettiCtr.dispose();
     _timer?.cancel();
     _timerStreamCtr.close();
     super.dispose();
@@ -171,6 +175,7 @@ class SpeedPuzzleState extends State<SpeedPuzzle> {
     } else {
       //win
       _timer?.cancel();
+      _confettiCtr.play();
       _playWinSound();
       setState(() {
         _isGameWin = true;
@@ -206,119 +211,150 @@ class SpeedPuzzleState extends State<SpeedPuzzle> {
       body: SafeArea(
         child: Center(
           child: Container(
-            color: kIsWeb ? Colors.white : Colors.transparent,
-            alignment: Alignment.center,
-            constraints: kIsWeb ? BoxConstraints(maxWidth: Def.webMaxWidth) : null,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(height: 25),
-                Padding(
-                  padding: const EdgeInsets.only(left: 30, right: 15),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Level",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFFD4645B)),
-                            ),
-                            Text(
-                              "${_currentQuestIdx + 1}/$_totalQuestionLength",
-                              style: TextStyle(fontSize: 26, color: Color(0xFF333333)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            const Text(
-                              "Timer",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFFD4645B)),
-                            ),
-                            StreamBuilder<int>(
-                                stream: _timerStreamCtr.stream,
-                                builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                                  int? times = _maxTime;
-                                  if (snapshot.hasData) {
-                                    times = snapshot.data;
-                                  }
-                                  return Text(
-                                    "${times!}",
-                                    style: TextStyle(fontSize: 26, color: Color(0xFF333333)),
-                                  );
-                                })
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                          child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Visibility(
-                          visible: !_isGameWin && !_isGameLose,
-                          child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _timer?.cancel();
-                                  _showPause();
-                                });
-                              },
-                              icon: Icon(
-                                Icons.pause,
-                                color: Color(0xFF333333),
-                                size: 30,
-                              )),
-                        ),
-                      ))
-                    ],
-                  ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                Expanded(
-                  child: (!_isGameWin && !_isGameLose)
-                      ? Stack(
-                          children: [
-                            Align(
-                              child: PuzzleView(
-                                key: ValueKey(_currentQuestion!.id!),
-                                controller: _puzzleViewCtr,
-                                question: _currentQuestion,
-                                questionType: _currentQuestion!.type,
+              color: kIsWeb ? Colors.white : Colors.transparent,
+              alignment: Alignment.center,
+              constraints: kIsWeb ? BoxConstraints(maxWidth: Def.webMaxWidth) : null,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 25),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30, right: 15),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Level",
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFFD4645B)),
+                                    ),
+                                    Text(
+                                      "${_currentQuestIdx + 1}/$_totalQuestionLength",
+                                      style: TextStyle(fontSize: 26, color: Color(0xFF333333)),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            // if (_isReady) //目前藉由_isReady啟動動畫
-                            StartAnimation(
-                              controller: _startAnimationCtr,
-                            )
-                          ],
-                        )
-                      : _isGameLose
-                          ? _buildGameLose()
-                          : _isGameWin
-                              ? _buildGameWin()
-                              : Container(),
-                ),
-                Container(height: 100)
-                // SizedBox(height: 100),
-                // Expanded(
-                //   child: Column(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     children: [
-                //       // StepIndicator(controller: _stepIndicatorCtr, step: _puzzleViewCtr.getStep == null ? 0 : _puzzleViewCtr.getStep!()),
-                //       SizedBox(height: 20),
-                //       PuzzleView(
-                //         controller: _puzzleViewCtr,
-                //       ),
-                //       SizedBox(height: 50),
-                //     ],
-                //   ),
-                // ),
-              ],
-            ),
-          ),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    const Text(
+                                      "Timer",
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFFD4645B)),
+                                    ),
+                                    StreamBuilder<int>(
+                                        stream: _timerStreamCtr.stream,
+                                        builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                                          int? times = _maxTime;
+                                          if (snapshot.hasData) {
+                                            times = snapshot.data;
+                                          }
+                                          return Text(
+                                            "${times!}",
+                                            style: TextStyle(fontSize: 26, color: Color(0xFF333333)),
+                                          );
+                                        })
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                  child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Visibility(
+                                  visible: !_isGameWin && !_isGameLose,
+                                  child: IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _timer?.cancel();
+                                          _showPause();
+                                        });
+                                      },
+                                      icon: Icon(
+                                        Icons.pause,
+                                        color: Color(0xFF333333),
+                                        size: 30,
+                                      )),
+                                ),
+                              ))
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                        Expanded(
+                          child: (!_isGameWin && !_isGameLose)
+                              ? Stack(
+                                  children: [
+                                    Align(
+                                      child: PuzzleView(
+                                        key: ValueKey(_currentQuestion!.id!),
+                                        controller: _puzzleViewCtr,
+                                        question: _currentQuestion,
+                                        questionType: _currentQuestion!.type,
+                                      ),
+                                    ),
+                                    // if (_isReady) //目前藉由_isReady啟動動畫
+                                    StartAnimation(
+                                      controller: _startAnimationCtr,
+                                    )
+                                  ],
+                                )
+                              : _isGameLose
+                                  ? _buildGameLose()
+                                  : _isGameWin
+                                      ? _buildGameWin()
+                                      : Container(),
+                        ),
+                        Container(height: 100)
+                        // SizedBox(height: 100),
+                        // Expanded(
+                        //   child: Column(
+                        //     mainAxisAlignment: MainAxisAlignment.center,
+                        //     children: [
+                        //       // StepIndicator(controller: _stepIndicatorCtr, step: _puzzleViewCtr.getStep == null ? 0 : _puzzleViewCtr.getStep!()),
+                        //       SizedBox(height: 20),
+                        //       PuzzleView(
+                        //         controller: _puzzleViewCtr,
+                        //       ),
+                        //       SizedBox(height: 50),
+                        //     ],
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                  ),
+                  Align(
+                    alignment: const Alignment(-1, -0.2),
+                    child: ConfettiWidget(
+                      confettiController: _confettiCtr,
+                      blastDirection: pi / 180 * 320, // radial value - LEFT
+                      particleDrag: 0.05, // apply drag to the confetti
+                      emissionFrequency: 0.4, // how often it should emit
+                      numberOfParticles: 15, // number of particles to emit
+                      gravity: 0.05, // gravity - or fall speed
+                      shouldLoop: false,
+                      // colors: const [Colors.green, Colors.blue, Colors.pink], // manually specify the colors to be used
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ConfettiWidget(
+                      confettiController: _confettiCtr,
+                      blastDirection: pi / 180 * 180, // radial value - LEFT
+                      particleDrag: 0.05, // apply drag to the confetti
+                      emissionFrequency: 0.3, // how often it should emit
+                      numberOfParticles: 10, // number of particles to emit
+                      gravity: 0.08, // gravity - or fall speed
+                      shouldLoop: false,
+                      // colors: const [Colors.green, Colors.blue, Colors.pink], // manually specify the colors to be used
+                    ),
+                  ),
+                ],
+              )),
         ),
       ),
     );

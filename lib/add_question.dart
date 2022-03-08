@@ -43,8 +43,8 @@ class _AddQuestionState extends State<AddQuestion> {
     setPuzzleViewController();
 
     //FIXME:
-    //txt回存回db
-    // _exportTxtDataToDB();
+    //txt回存回db，創新題目必須開
+    _exportTxtDataToDB();
 
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       // _showIntro();

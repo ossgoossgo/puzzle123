@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Puzzle123"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "Sheng-wen Wang"
 #define MyAppURL "https://sites.google.com/view/puzzlehackpuzzle123/%E9%A6%96%E9%A0%81"
 #define MyAppExeName "puzzle123.exe"
@@ -24,7 +24,7 @@ DisableProgramGroupPage=yes
 ;PrivilegesRequired=lowest
 OutputDir=C:\Users\Ossgo\Documents\puzzle123\installers\exe_creator
 OutputBaseFilename=Puzzle123
-SetupIconFile=C:\Users\Ossgo\Downloads\atmo3-oxjxt-004.ico
+SetupIconFile=C:\Users\Ossgo\Documents\puzzle123\installers\exe_creator\icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern

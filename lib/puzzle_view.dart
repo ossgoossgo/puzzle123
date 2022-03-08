@@ -342,6 +342,10 @@ class _PuzzleViewState extends State<PuzzleView> {
     if (!_selectedIndexes.contains(index)) {
       Random random = Random();
       _currentSelectIdx = index;
+
+      if((_checkPointList.contains(index))){
+        SoundHelper.playCheckPointSound();
+      }
       _playBoSound();
       setState(() {
         _selectedIndexes.add(index!);

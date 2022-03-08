@@ -146,7 +146,6 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
     };
   }
 
-
   @override
   Widget build(BuildContext context) {
     if (_currentQuestion == null) return Container();
@@ -163,71 +162,78 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const SizedBox(height: 25),
-                Padding(
-                  padding: const EdgeInsets.only(left: 30, right: 15),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Container(
-                        // color: Colors.blue,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _showPause();
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.pause,
-                                color: Color(0xFF333333),
-                                size: 30,
-                              )),
-                        ),
-                      ))
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                Row(
                   children: [
-                    const Text(
-                      "Level",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFFD4645B)),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              _showNextLevelBtn = false;
-                              _prevQuestion();
-                            },
-                            icon: const Icon(
-                              Icons.arrow_left,
-                              size: 30,
-                            )),
-                        const SizedBox(width: 10),
-                        Text(
-                          "${_currentQuestionIdx != -1 ? _currentQuestionIdx + 1 : -1}/$_questionLength",
-                          style: TextStyle(fontSize: 26, color: Color(0xFF333333)),
+                    const Spacer(flex: 5),
+                    Expanded(
+                      flex: 20,
+                      child: Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "Level",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFFD4645B)),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      _showNextLevelBtn = false;
+                                      _prevQuestion();
+                                    },
+                                    icon: const Icon(
+                                      Icons.arrow_left,
+                                      size: 30,
+                                    )),
+                                const SizedBox(width: 10),
+                                Text(
+                                  "${_currentQuestionIdx != -1 ? _currentQuestionIdx + 1 : -1}/$_questionLength",
+                                  style: const TextStyle(fontSize: 26, color: Color(0xFF333333)),
+                                ),
+                                const SizedBox(width: 10),
+                                IconButton(
+                                    onPressed: () {
+                                      _showNextLevelBtn = false;
+                                      _nextQuestion();
+                                    },
+                                    icon: const Icon(
+                                      Icons.arrow_right,
+                                      size: 30,
+                                    ))
+                              ],
+                            )
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        IconButton(
-                            onPressed: () {
-                              _showNextLevelBtn = false;
-                              _nextQuestion();
-                            },
-                            icon: const Icon(
-                              Icons.arrow_right,
-                              size: 30,
-                            ))
-                      ],
-                    )
+                      ),
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _showPause();
+                                  });
+                                },
+                                icon: const Icon(
+                                  Icons.pause,
+                                  color: Color(0xFF333333),
+                                  size: 30,
+                                ))),
+                      ),
+                    ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
+                // const SizedBox(
+                //   height: 10,
+                // ),
+                const Spacer(
+                  flex: 2,
                 ),
                 Container(
                     padding: EdgeInsets.symmetric(vertical: 5),
@@ -246,45 +252,55 @@ class _PlayAllQuestionsState extends State<PlayAllQuestions> {
                 const SizedBox(
                   height: 20,
                 ),
-                Expanded(
+                Flexible(
+                    flex: 20,
                     child: Column(
-                  children: [
-                    PuzzleView(
-                      key: ValueKey(_currentQuestion!.id!),
-                      questionType: _questionType,
-                      controller: _puzzleViewCtr,
-                      question: _currentQuestion,
-                    ),
-                    const SizedBox(height: 10),
-                    Visibility(
-                      visible: _showNextLevelBtn,
-                      child: Container(
-                        height: 56,
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: TextButton(
-                            style: ButtonStyle(
-                              overlayColor: MaterialStateProperty.all(Colors.grey[100]!.withOpacity(0.5)),
-                              backgroundColor: MaterialStateProperty.all(Colors.pinkAccent),
+                      children: [
+                        PuzzleView(
+                          key: ValueKey(_currentQuestion!.id!),
+                          questionType: _questionType,
+                          controller: _puzzleViewCtr,
+                          question: _currentQuestion,
+                        ),
+                        const SizedBox(height: 10),
+                        Flexible(
+                          // padding: const EdgeInsets.all(8.0),
+                          child: Visibility(
+                            visible: _showNextLevelBtn,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Container(
+                                height: 56,
+                                margin: const EdgeInsets.symmetric(vertical: 10),
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: TextButton(
+                                    style: ButtonStyle(
+                                      overlayColor: MaterialStateProperty.all(Colors.grey[100]!.withOpacity(0.5)),
+                                      backgroundColor: MaterialStateProperty.all(Colors.pinkAccent),
+                                    ),
+                                    onPressed: () {
+                                      // _player.play("click.mp3", volume: 0.3);
+                                      SoundHelper.playClickSound(volume: 0.3);
+                                      _showNextLevelBtn = false;
+                                      _nextQuestion();
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 2),
+                                      child: FittedBox(
+                                          child: Text(
+                                        "Next level",
+                                        style: TextStyle(height: 1.5, fontSize: 25, fontFamily: "BalooBhaijaan2", color: Colors.white),
+                                      )),
+                                    )),
+                              ),
                             ),
-                            onPressed: () {
-                              // _player.play("click.mp3", volume: 0.3);
-                              SoundHelper.playClickSound(volume: 0.3);
-                              _showNextLevelBtn = false;
-                              _nextQuestion();
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 2),
-                              child: FittedBox(
-                                  child: Text(
-                                "Next level",
-                                style: TextStyle(height: 1.5, fontSize: 25, fontFamily: "BalooBhaijaan2", color: Colors.white),
-                              )),
-                            )),
-                      ),
-                    ),
-                  ],
-                )),
+                          ),
+                        ),
+                      ],
+                    )),
+                const Spacer(
+                  flex: 2,
+                ),
               ],
             ),
           ),
